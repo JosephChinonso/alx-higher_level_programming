@@ -1,81 +1,73 @@
+13-is_palindrome.c
 #include "lists.h"
-#include <stdlib.h>
-#include <stdio.h>
 
-/* Define the structure for a singly linked list node */
-typedef struct listint_s {
-    int n;
-    struct listint_s *next;
-} listint_t;
-
-/* Function to check if a linked list is a palindrome */
-int is_palindrome(listint_t **head);
-
-int main(void)
+/**
+ * reverse_listint - reverses a linked list
+ * @head: pointer to the first node in the list
+ *
+ * Return: pointer to the first node in the new list
+ */
+void reverse_listint(listint_t **head)
 {
-    /* Example usage */
-    listint_t *head = NULL;
+	listint_t *prev = NULL;
+	listint_t *current = *head;
+	listint_t *next = NULL;
 
-    /* TODO: Create your linked list here */
+	while (current)
+	{
+		next = current->next;
+		current->next = prev;
+		prev = current;
+		current = next;
+	}
 
-    if (is_palindrome(&head))
-        printf("The linked list is a palindrome.\n");
-    else
-        printf("The linked list is not a palindrome.\n");
-
-    return 0;
+	*head = prev;
 }
 
-/* Helper function to reverse a linked list */
-listint_t *reverse_list(listint_t *head)
-{
-    listint_t *prev = NULL;
-    listint_t *current = head;
-    listint_t *next = NULL;
-
-    while (current != NULL) {
-        next = current->next;
-        current->next = prev;
-        prev = current;
-        current = next;
-    }
-
-    return prev;
-}
-
-/* Function to check if a linked list is a palindrome */
+/**
+ * is_palindrome - checks if a linked list is a palindrome
+ * @head: double pointer to the linked list
+ *
+ * Return: 1 if it is, 0 if not
+ */
 int is_palindrome(listint_t **head)
 {
-    if (*head == NULL || (*head)->next == NULL) {
-        return 1;  // An empty list or a single element list is a palindrome
-    }
+	listint_t *slow = *head, *fast = *head, *temp = *head, *dup = NULL;
 
-    listint_t *slow = *head;
-    listint_t *fast = *head;
-    listint_t *prev_slow = *head;
-    listint_t *second_half = NULL;
+	if (*head == NULL || (*head)->next == NULL)
+		return (1);
 
-    while (fast != NULL && fast->next != NULL) {
-        fast = fast->next->next;
-        prev_slow = slow;
-        slow = slow->next;
-    }
+	while (1)
+	{
+		fast = fast->next->next;
+		if (!fast)
+		{
+			dup = slow->next;
+			break;
+		}
+		if (!fast->next)
+		{
+			dup = slow->next->next;
+			break;
+		}
+		slow = slow->next;
+	}
 
-    if (fast != NULL) {  // Odd number of elements, skip the middle one
-        slow = slow->next;
-    }
+	reverse_listint(&dup);
 
-    second_half = reverse_list(slow);
-    slow = *head;
+	while (dup && temp)
+	{
+		if (temp->n == dup->n)
+		{
+			dup = dup->next;
+			temp = temp->next;
+		}
+		else
+			return (0);
+	}
 
-    while (second_half != NULL) {
-        if (slow->n != second_half->n) {
-            return 0;  // Not a palindrome
-        }
-        slow = slow->next;
-        second_half = second_half->next;
-    }
+	if (!dup)
+		return (1);
 
-    return 1;  // Palindrome
+	return (0);
 }
-
